@@ -3,20 +3,12 @@ import cv2
 import numpy as np
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 from tensorflow.keras.models import load_model
-
+import utils
 
 model = load_model('my_model.h5')
 default_camera = 0
 
 
-def img_preprocess(img):
-    img = np.asarray(img)
-    img = cv2.resize(img,(32, 32))
-    img = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-    img = cv2.equalizeHist(img)
-    img = img/255
-    img = img.reshape(1, 32, 32, 1)
-    return img
 
 
 cap = cv2.VideoCapture(default_camera)
@@ -24,7 +16,9 @@ cap = cv2.VideoCapture(default_camera)
 while True:
     _, frame = cap.read()
 
-    curr_img = img_preprocess(frame)
+    img = np.asarray(img)
+    curr_img = utils.img_preprocess(frame)
+    img = img.reshape(1, 32, 32, 1)
 
     predictions = model.predict(curr_img)
     recognized_digit = np.argmax(predictions, axis=1)
